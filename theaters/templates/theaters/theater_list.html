@@ -1,0 +1,51 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}映画館一覧 | 管理人専用{% endblock %}
+
+{% block content %}
+<h2>映画館一覧</h2>
+
+<div class="form-card"> <table class="form-table"> <thead>
+            <tr>
+                <th>映画館名</th>
+                <th>アクション</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in theaters %}
+            <tr>
+                <td>
+                    <a href="{% url 'theaters:theater_detail' t.pk %}" class="theater-name-link">
+                        <strong>{{ t.name }}</strong>
+                    </a>
+                </td>
+
+                <td>
+                    <div class="action-buttons"> <a href="{% url 'accounts:manager_list' %}?theater_id={{ t.pk }}" class="btn-navy btn-xs">
+                            担当支配人
+                        </a>
+                        
+                        <a href="{% url 'theaters:theater_delete' t.pk %}" 
+                        onclick="return confirm('本当に削除しますか？');" 
+                        class="btn-danger-outline btn-xs">
+                            削除
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2" style="text-align: center; padding: 30px; color: #999;">
+                    登録されている映画館がありません。
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="button-container" style="padding-left: 0; justify-content: flex-start;">
+        <a href="{% url 'theaters:theater_create' %}" class="btn-navy btn-small">＋ 新しい映画館を登録する</a>
+        <a href="{% url 'accounts:admin_Top' %}" class="btn-navy btn-small">戻る</a>
+    </div>
+</div>
+{% endblock %}

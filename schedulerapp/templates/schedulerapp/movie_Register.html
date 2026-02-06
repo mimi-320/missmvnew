@@ -1,0 +1,73 @@
+<div class="container">
+    <h2>映画分析シミュレーター</h2>
+    <form action="" method="post">
+        {% csrf_token %}
+
+        <div class="section">
+            <h3>【人物・組織設定】</h3>
+            <label>監督名:</label>
+            <input type="text" name="director_name" placeholder="例：スティーヴン・スピルバーグ">
+            
+            <label>主演キャスト1:</label>
+            <input type="text" name="cast_name1" placeholder="例：トム・クルーズ">
+            
+            <label>主演キャスト2:</label>
+            <input type="text" name="cast_name2" placeholder="例：ブラッド・ピット">
+            
+            <label>主演キャスト3:</label>
+            <input type="text" name="cast_name3" placeholder="例：アン・ハサウェイ">
+
+            <label>制作会社名:</label>
+            <input type="text" name="company_name" placeholder="例：ワーナー・ブラザース">
+        </div>
+
+        <div class="section">
+            <h3>【基本データ】</h3>
+            <label>予算 (Budget):</label>
+            <input type="number" name="budget" placeholder="例：50000000">
+
+            <label>公開月 (1〜12):</label>
+            <input type="number" name="release_month" min="1" max="12">
+            
+            <label>
+                <input type="checkbox" name="is_series" value="1" style="width: auto;"> シリーズもの（続編など）
+            </label>
+        </div>
+
+        <div class="section">
+            <h3>【ジャンル・言語】</h3>
+            <label>メインジャンル:</label>
+            <select name="genre">
+                <option value="is_action">アクション (Action)</option>
+                <option value="is_adventure">アドベンチャー (Adventure)</option>
+                <option value="is_animation">アニメーション (Animation)</option>
+                <option value="is_fantasy">ファンタジー (Fantasy)</option>
+                <option value="is_scifi">SF (Science Fiction)</option>
+                <option value="is_family">ファミリー (Family)</option>
+                <option value="is_comedy">コメディ (Comedy)</option>
+                <option value="is_romance">ロマンス (Romance)</option>
+                <option value="is_drama">ドラマ (Drama)</option>
+                <option value="is_horror">ホラー (Horror)</option>
+                <option value="is_thriller">スリラー (Thriller)</option>
+            </select>
+
+            <label>主な言語:</label>
+            <select name="language">
+                <option value="en">英語 (en)</option>
+                <option value="ja">日本語 (ja)</option>
+                <option value="fr">フランス語 (fr)</option>
+                <option value="de">ドイツ語 (de)</option>
+                <option value="it">イタリア語 (it)</option>
+                <option value="other_lang">その他</option>
+            </select>
+        </div>
+
+        <button type="submit">興行収入を予測する</button>
+    </form>
+
+    {% if result %}
+    <div style="margin-top: 20px; padding: 20px; background-color: #e8f8f5; border-radius: 10px;">
+        <h3 style="color: #16a085;">予想興行収入: {{ result }}</h3>
+    </div>
+    {% endif %}
+</div>

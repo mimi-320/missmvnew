@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>映画館管理システム - TOP</title>
+</head>
+<body>
+
+    <h1>🎬 映画館スケジュール管理システム</h1>
+    <p>卒業制作：AIによる上映スケジュール最適化（開発中）</p>
+
+    <div class="box">
+        {% if user.is_authenticated %}
+            <h2>ようこそ、{{ user.username }} さん！</h2>
+
+            {% if user.is_top_admin %}
+                <p>あなたの権限：<span class="admin-label">本部管理人</span></p>
+                <p>全ての店舗データとAIランキングの管理が可能です。</p>
+                <a href="/admin/" class="btn">管理画面（Admin）へ移動</a>
+            
+            {% elif user.is_manager %}
+                <p>あなたの権限：<span class="manager-label">店舗支配人</span></p>
+                <p>担当店舗：<strong>{{ user.manager_profile.theater.name|default:"（未割り当て）" }}</strong></p>
+                
+                {% if user.manager_profile.needs_password_change %}
+                    <p style="background: yellow; padding: 10px;">⚠️ セキュリティ：初回のパスワード変更を行ってください！</p>
+                {% endif %}
+                
+                <a href="#" class="btn">担当店舗のスケジュールを確認</a>
+            {% endif %}
+
+            <br><br>
+            <form action="{% url 'admin:logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit">ログアウト</button>
+            </form>
+
+        {% else %}
+            <h2>ゲストさん、こんにちは</h2>
+            <p>このシステムを利用するにはログインが必要です。</p>
+            <a href="/admin/login/" class="btn">ログイン画面へ</a>
+        {% endif %}
+    </div>
+
+    <hr>
+    <h3>現在のシステム構成（メモ）</h3>
+    <ul>
+        <li>Accountsアプリ：ユーザー・権限管理</li>
+        <li>Theatersアプリ：映画館・スクリーン管理</li>
+        <li>Moviesアプリ：映画データ・AIスコア管理</li>
+        <li>Schedulerアプリ：上映スケジュール作成</li>
+    </ul>
+
+</body>
+</html>

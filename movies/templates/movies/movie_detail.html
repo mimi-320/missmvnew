@@ -1,0 +1,25 @@
+<h1>登録完了：{{ movie.title }}</h1>
+
+<fieldset>
+    <legend><strong>基本情報（入力したもの）</strong></legend>
+    <ul>
+        <li>監督: {{ movie.director_name }}</li>
+        <li>キャスト: {{ movie.cast1_name }}, {{ movie.cast2_name }}</li>
+    </ul>
+</fieldset>
+
+<h2 style="color: blue;">🤖 AIが算出したデータ（自動入力結果）</h2>
+{% if ai_data %}
+    <ul>
+        <li><strong>監督ランク:</strong> {{ ai_data.director_rank }}</li>
+        <li><strong>配給会社ランク:</strong> {{ ai_data.company_rank }}</li>
+        <li><strong>キャスト合計スコア:</strong> {{ ai_data.cast_total_score }}</li>
+        <li><strong>公開予定月:</strong> {{ ai_data.release_month }}月</li>
+    </ul>
+    <p>※ここの数字が 0 以外になっていれば、AIパックとの連携は大成功です！</p>
+{% else %}
+    <p>AIデータがまだ計算されていません。signals.pyを確認してください。</p>
+{% endif %}
+
+<br>
+<a href="{% url 'movies:movie_list' %}">映画一覧へ</a>

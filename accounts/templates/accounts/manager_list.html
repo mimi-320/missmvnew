@@ -1,0 +1,54 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}支配人一覧 | 管理人専用{% endblock %}
+
+{% block content %}
+<h2>支配人一覧・検索</h2>
+
+<div class="form-card"> <div class="search-section">
+        <form method="get" action="" class="search-form">
+            <label for="theater_id">映画館で絞り込む：</label>
+            <select name="theater_id" id="theater_id" onchange="this.form.submit()">
+                <option value="">すべての支配人を表示</option>
+                {% for t in theaters %}
+                    <option value="{{ t.pk }}" {% if t.pk|stringformat:"s" == selected_theater %}selected{% endif %}>
+                        {{ t.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <a href="{% url 'accounts:manager_list' %}" class="btn-link">リセット</a>
+        </form>
+    </div>
+
+    <table class="form-table"> <thead>
+            <tr>
+                <th>ユーザー名</th>
+                <th>担当映画館</th>
+                <th>アクション</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in managers %}
+            <tr>
+                <td><strong>{{ m.user.username }}</strong></td>
+                <td>{{ m.theater.name|default:"未設定" }}</td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'accounts:manager_theater_update' m.pk %}" class="btn-navy btn-xs">映画館を変更</a>
+                        <a href="{% url 'accounts:manager_delete' m.user.pk %}" 
+                           onclick="return confirm('本当に削除しますか？');" 
+                           class="btn-danger-outline btn-xs">削除</a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" style="text-align: center; padding: 30px;">該当する支配人は見つかりませんでした。</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="button-container" style="padding-left: 0;">
+        <a href="{% url 'accounts:admin_Top' %}" class="btn-navy btn-small">管理人トップへ戻る</a>
+    </div>
+</div>
+{% endblock %}

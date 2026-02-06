@@ -1,0 +1,25 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}支配人登録 | 管理人専用{% endblock %}
+
+{% block content %}
+<h2>新しい支配人を登録する</h2>
+<p>ユーザー名・パスワードを設定し、担当する映画館を選択してください。</p>
+
+<div class="form-card"> <form method="post" class="standard-form"> {% csrf_token %}
+        
+        {{ form.as_p }}
+
+        <div class="button-container">
+            <button type="submit" class="btn-navy btn-small">この内容で登録する</button>
+            <a href="{% url 'accounts:admin_Top' %}" class="btn-navy btn-small">キャンセル</a>
+        </div>
+    </form>
+
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+        <p style="color: #7f8c8d; font-size: 0.85rem;">
+            ※ 登録されたユーザーは自動的に「支配人権限」が付与されます。
+        </p>
+    </div>
+</div>
+{% endblock %}

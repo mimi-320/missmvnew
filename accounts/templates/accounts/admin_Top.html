@@ -1,0 +1,53 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}管理人ダッシュボード{% endblock %}
+
+{% block content %}
+    <main>
+        <section>
+            <h2>ようこそ、{{ request.user.username }}さん</h2>
+            <p>ここではシステム全体の管理（映画データ・映画館・支配人アカウント）が行えます。</p>
+        </section>
+
+        <hr>
+
+        <nav>
+            <ul style="list-style: none; padding: 0;">
+                <li>
+                    <h3>映画館・支配人管理</h3>
+                    <p>提携映画館の追加や、支配人アカウントの発行・一覧確認を行います。</p>
+                    
+                    <div class="card-grid">
+                        <section>
+                            <h4>映画館管理</h4>
+                            <ul>
+                                <li><a href="{% url 'theaters:theater_create' %}">映画館を登録する</a></li>
+                                <li><a href="{% url 'theaters:theater_list' %}">映画館一覧・削除</a></li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>支配人管理</h4>
+                            <ul>
+                                <li><a href="{% url 'accounts:manager_create' %}">支配人を作る</a></li>
+                                <li><a href="{% url 'accounts:manager_list' %}">支配人一覧・編集・削除</a></li>
+                            </ul>
+                        </section>
+                    </div>
+                </li>
+
+                <hr style="margin-top: 30px;">
+
+                <li>
+                    <h3>映画マスター管理</h3>
+                    <p>作品の基本情報（タイトル・上映時間など）を登録・編集します。</p>
+                    <a href="{% url 'movies:movie_create' %}" class="logout-btn" style="background-color: var(--primary); text-decoration: none; display: inline-block;">映画作品を登録する</a>
+                </li>
+            </ul>
+        </nav>
+    </main>
+
+    <footer style="margin-top: 50px; text-align: center; color: #888;">
+        <p>卒業制作：映画館予約管理システム</p>
+    </footer>
+{% endblock %}

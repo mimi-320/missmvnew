@@ -1,0 +1,48 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}管理人ダッシュボード{% endblock %}
+
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ theater.name }} | 詳細情報</title>
+</head>
+<body>
+    <h1>{{ theater.name }}</h1>
+    
+    <div style="background-color: #f9f9f9; padding: 15px; border: 1px solid #ddd;">
+        <p><strong>住所:</strong> {{ theater.address }}</p>
+        <p><strong>総スクリーン数:</strong> {{ theater.total_screens }} スクリーン</p>
+    </div>
+
+    <h3>シアター別座席数</h3>
+    <table border="1" cellpadding="10" style="border-collapse: collapse; width: 50%;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th>シアター番号</th>
+                <th>最大座席数</th>
+                <th>サイズ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in screens %}
+            <tr>
+                <td>シアター {{ s.screen_number }}</td>
+                <td>{{ s.capacity }} 席</td>
+                <td>{{ s.screen_size }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">シアター情報が登録されていません。</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p style="margin-top: 20px;">
+        <a href="{% url 'theaters:theater_list' %}">← 映画館一覧に戻る</a>
+    </p>
+</body>
+
+{% endblock %}

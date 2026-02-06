@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>自館シアター情報 - 支配人ページ</title>
+</head>
+<body style="background-color: #121212; color: #e0e0e0; font-family: sans-serif; padding: 20px;">
+
+    <h1>🎬 自館シアター情報確認</h1>
+    <hr>
+
+    <p><strong>ログイン中の支配人:</strong> {{ user.username }} さん</p>
+    <p>あなたが担当している映画館の各スクリーン情報です。</p>
+
+    <table border="1" cellspacing="0" cellpadding="12" style="border-color: #444; width: 100%; max-width: 800px; text-align: left;">
+        <thead>
+            <tr bgcolor="#2c3e50" style="color: white;">
+                <th>シアター番号</th>
+                <th>最大座席数</th>
+                <th>スクリーンサイズ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in screens %}
+            <tr>
+                <td><strong>第 {{ s.screen_number }} シアター</strong></td>
+                <td>{{ s.capacity }} 席</td>
+                <td>{{ s.screen_size }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" style="text-align: center; padding: 40px;">
+                    シアター情報が見つかりません。<br>
+                    管理画面で「担当映画館の割当」が正しく行われているか確認してください。
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br>
+    <hr>
+    <p>
+        <a href="{% url 'accounts:manager_Top' %}" style="color: #3498db; text-decoration: none;">
+            ← 支配人トップへ戻る
+        </a>
+    </p>
+
+</body>
+</html>

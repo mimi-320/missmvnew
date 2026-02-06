@@ -1,0 +1,27 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}担当映画館の変更 | 管理人専用{% endblock %}
+
+{% block content %}
+<h2>担当映画館の変更</h2>
+<p>支配人：<strong>{{ target_user.username }}</strong> さんの担当館を設定してください。</p>
+
+<div class="form-card"> <form method="post" class="standard-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_theater">新しい担当映画館：</label>
+            {{ form.theater }}
+        </div>
+
+        <div class="button-container">
+            <button type="submit" class="btn-navy btn-small">変更を保存する</button>
+            <a href="{% url 'accounts:manager_list' %}" class="btn-navy btn-small btn-outline">戻る</a>
+        </div>
+    </form>
+</div>
+
+<footer class="admin-footer">
+    <p>卒業制作：映画館予約管理システム</p>
+</footer>
+{% endblock %}

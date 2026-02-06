@@ -1,0 +1,39 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}管理人パネル{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<header>
+    <div class="nav-links">
+        <strong>Miss Mv</strong>
+        <a href="{% url 'accounts:admin_Top' %}">管理人Top</a>
+        <a href="{% url 'theaters:theater_create' %}">映画館登録</a>
+        <a href="{% url 'theaters:theater_list' %}">映画館一覧</a>
+        <a href="{% url 'accounts:manager_create' %}">支配人登録</a>
+        <a href="{% url 'accounts:manager_list' %}">支配人一覧</a>
+        <a href="{% url 'movies:movie_list' %}">映画カタログ</a>
+    </div>
+
+    <div class="user-area">
+        <span class="login-info"> ログイン中: <strong>{{ request.user.username }}</strong></span>
+        <form action="{% url 'accounts:logout' %}" method="post" style="margin: 0; display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">ログアウト</button>
+        </form>
+    </div>
+</header>
+
+<div class="container">
+    {% block content %}
+    {% endblock %}
+</div>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>新規映画登録</title>
+</head>
+<body>
+    <h1>🎬 映画カタログへの新規登録</h1>
+    <p>ここに入力した情報をもとに、システムが自動で監督ランクやAI期待度を算出します。</p>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc;">
+            <legend><strong>▼ 1. 基本データ（AI計算の土台）</strong></legend>
+            <p>
+                {{ form.title.label_tag }}<br>
+                {{ form.title }}
+            </p>
+            <p>
+                {{ form.runtime.label_tag }} (分)<br>
+                {{ form.runtime }} 
+            </p>
+            <p>
+                {{ form.release_date.label_tag }} (例: 2026-02-05)<br>
+                {{ form.release_date }}
+            </p>
+            <p>
+                {{ form.budget.label_tag }} (円)<br>
+                {{ form.budget }}
+            </p>
+            <p>
+                {{ form.language.label_tag }} (ja / en / it など)<br>
+                {{ form.language }}
+            </p>
+        </fieldset>
+
+        <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc;">
+            <legend><strong>▼ 2. 制作・キャスト（名簿からランクを引きます）</strong></legend>
+            <p>
+                {{ form.company.label_tag }}<br>
+                {{ form.company }}
+            </p>
+            <p>
+                {{ form.director_name.label_tag }}<br>
+                {{ form.director_name }}
+            </p>
+            <p>
+                俳優（メイン3名）:<br>
+                1. {{ form.cast1_name }}<br>
+                2. {{ form.cast2_name }}<br>
+                3. {{ form.cast3_name }}
+            </p>
+        </fieldset>
+
+        <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc;">
+            <legend><strong>▼ 3. ジャンル・特性（AIの予測精度に関わります）</strong></legend>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <label>{{ form.is_series }} シリーズ作品</label>
+                <label>{{ form.is_animation }} アニメーション</label>
+                <label>{{ form.is_action }} アクション</label>
+                <label>{{ form.is_adventure }} アドベンチャー</label>
+                <label>{{ form.is_fantasy }} ファンタジー</label>
+                <label>{{ form.is_drama }} ドラマ</label>
+                </div>
+        </fieldset>
+
+        <div style="margin-top: 30px;">
+            <button type="submit" style="padding: 10px 40px; font-size: 1.2rem; cursor: pointer;">
+                カタログに登録してAI解析を実行する
+            </button>
+            <br><br>
+            <a href="{% url 'movies:movie_list' %}">一覧に戻る</a>
+        </div>
+    </form>
+</body>
+</html>
