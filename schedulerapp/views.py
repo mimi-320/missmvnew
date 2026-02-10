@@ -1,70 +1,65 @@
 import os
 import pickle
 import pandas as pd
-from django.shortcuts import render
+from datetime import datetime
+
 from django.views.generic import TemplateView
 from django.conf import settings
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.views import View
 
+from .utils import fill_contract_schedules
+from .models import Schedule
+from movies.models import Movie, NowShowingMovie
 
+# --- トップページ ---
 class Top_pageView(TemplateView):
     template_name = 'schedulerapp/Top.html'
 
+# --- AI予測 & 自分の映画館への登録 ---
 class PredictorView(TemplateView):
     template_name = 'schedulerapp/movie_Register.html'
 
-    # 映画の売り上げ予測の変数を作成
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['result'] = None
         return context
 
-
     def post(self, request, *args, **kwargs):
-        # モデル、監督、キャスト情報と接続
+        # 1. 学習済みモデル(pickle)の読み込み
         path = os.path.join(settings.BASE_DIR, 'cinema_pack.pkl')
-        # モデルが見つからない場合
         if not os.path.exists(path):
             return render(request, self.template_name, {'result': 'cinema_pack.pklが見つかりません'})
 
-        # 接続したデータを読み取り専用で使用可能にする
         with open(path, 'rb') as f:
             pack = pickle.load(f)
 
-        # 監督情報の受け取り
+        # 2. 画面からの入力（タイトル、監督、予算など）
+        movie_title = request.POST.get('title') 
         d_name = request.POST.get('director_name')
-        # キャスト情報の受け取り
         c_names = [
             request.POST.get('cast_name1'),
             request.POST.get('cast_name2'),
             request.POST.get('cast_name3')
         ]
-        # 制作会社情報の受け取り
         comp_name = request.POST.get('company_name')
-        # 数値入力、数字以外の入力だった場合それぞれ0,1を代入
+
         try:
-            # 予算
             budget = float(request.POST.get('budget', 0))
-            # 公開月
             month = int(request.POST.get('release_month', 1))
         except ValueError:
             budget, month = 0, 1
 
-        # シリーズものか判定,1はシリーズ
         is_series = 1 if request.POST.get('is_series') else 0
-        # ジャンル情報の受け取り
         genre_selected = request.POST.get('genre')
 
-        # 監督情報をランク表と照らし合わせランクを割り出す
+        # 3. 特徴量の計算（AIモデル用）
         d_rank = pack['rank_map'].get(d_name, 0)
-        # 3人の出演映画の売り上げの合計をランクデータと照らし合わせる
         c_score = sum([pack['actor_map'].get(name, 0) for name in c_names if name])
-        # 制作会社のランクを割り出す
         comp_rank = pack['comp_map'].get(comp_name, 0)
 
-        # AI用データ作成
-        # 情報を渡すひな形作成
         input_dict = {col: 0 for col in pack['features']}
-        # 情報登録
         input_dict.update({
             'budget': budget,
             'release_month': month,
@@ -76,15 +71,135 @@ class PredictorView(TemplateView):
             'budget_relative_score': 1.0,
             'cast_relative_score': 1.0,
         })
-        # 選んだジャンルだけ1に変える
         if genre_selected in input_dict:
             input_dict[genre_selected] = 1
 
-        # 予測実行
-        # データフレーム型に変える
+        # 4. 予測実行
         input_df = pd.DataFrame([input_dict])[pack['features']]
-        # モデルにデータを渡す
         pred = pack['model'].predict(input_df)[0]
-        # 予測結果を変数に格納
-        result = "{:,} ドル".format(int(pred))
+        prediction_value = int(pred)
+
+        # 自分の映画館のデータとしてデータベースに保存
+        if movie_title:
+            try:
+                # ログインしているユーザーの映画館を取得
+                my_theater = request.user.manager_profile.theater
+                # 元の映画マスタを取得
+                movie_obj = Movie.objects.filter(title=movie_title).first()
+                
+                if movie_obj:
+                    # 「映画」×「自分の映画館」で上映中映画データを作成/更新
+                    now_showing, created = NowShowingMovie.objects.get_or_create(
+                        movie=movie_obj,
+                        theater=my_theater
+                    )
+                    
+                    # 予測値と計算用パラメータを保存
+                    now_showing.predicted_final_revenue = prediction_value
+                    now_showing.prediction_score = prediction_value  # スコア計算用
+                    now_showing.company_rank = comp_rank
+                    now_showing.director_rank = d_rank
+                    now_showing.cast_total_score = c_score
+                    now_showing.release_month = month
+                    now_showing.save()
+                    
+            except Exception as e:
+                print(f"DB保存エラー: {e}")
+
+        result = "{:,} ドル".format(prediction_value)
         return render(request, self.template_name, {'result': result})
+
+# --- スケジュール自動生成 ---
+def schedule_generate_view(request):
+    if request.method == "POST":
+        target_date = request.POST.get('target_date')
+        
+        if not target_date:
+            messages.error(request, "日付を選択してください。")
+        else:
+            # 自分の映画館のスケジュールだけを削除して再生成
+            my_theater = request.user.manager_profile.theater
+            Schedule.objects.filter(
+                screen__theater=my_theater, 
+                start_time__date=target_date
+            ).delete()
+
+            # utils.py のロジックを実行
+            errors = fill_contract_schedules(target_date, request.user)
+            
+            if errors:
+                for error in errors:
+                    messages.error(request, error)
+            else:
+                messages.success(request, f"{target_date} のスケジュールを作成しました！")
+            
+            return redirect('schedulerapp:schedule_generate')
+
+    return render(request, 'schedulerapp/generate.html')
+
+def schedule_list_view(request):
+    my_theater = request.user.manager_profile.theater
+    target_date_str = request.GET.get('date')
+
+    if target_date_str:
+        try:
+            target_date = datetime.strptime(target_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            target_date = datetime.now().date()
+    else:
+        target_date = datetime.now().date()
+
+    # 1. 普通にスケジュールを取得
+    schedules = Schedule.objects.filter(
+        screen__theater=my_theater,
+        start_time__date=target_date
+    ).order_by('movie', 'start_time')
+
+    # 2. 【ここが重要！】映画ごとに上映時間をまとめる
+    movie_schedules = {}
+    for s in schedules:
+        movie = s.movie
+        if movie not in movie_schedules:
+            movie_schedules[movie] = []
+        movie_schedules[movie].append(s)
+
+    return render(request, 'schedulerapp/list.html', {
+        'movie_schedules': movie_schedules, # まとめたデータを渡す
+        'target_date': target_date,
+    })
+
+from django.shortcuts import render, redirect
+from .utils import create_weekly_schedule
+from datetime import date
+
+from django.shortcuts import render
+from .utils import create_weekly_schedule
+from datetime import date
+
+import time 
+
+def create_weekly_schedule(start_date_str, user):
+    # 1. 入力された日付文字列（"2026-02-10"）を「日付オブジェクト」にする
+    start_dt = datetime.strptime(start_date_str, '%Y-%m-%d')
+    
+    total_reports = []
+
+    # 2. 0から6まで（計7回）ループする
+    for i in range(7):
+        seconds_per_day = 86400
+        current_seconds = start_dt.timestamp() + (i * seconds_per_day)
+        
+        # 数字をまた「日付」に戻す
+        target_date = datetime.fromtimestamp(current_seconds).date()
+        
+        # 3. 1日分の生成ロジックを呼び出す
+        daily_errors = fill_contract_schedules(target_date, user)
+        
+        # 結果をレポートに追加
+        date_label = target_date.strftime('%m/%d(%a)')
+        if not daily_errors:
+            total_reports.append(f"{date_label}: 生成完了")
+        else:
+            total_reports.append(f"{date_label}: エラー({daily_errors[0]})")
+            
+    return total_reports

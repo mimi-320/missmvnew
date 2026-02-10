@@ -2,25 +2,28 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>映画カタログ一覧</title>
+    <title>上映映画一覧 - {{ request.user.manager_profile.theater.name }}</title>
     <style>
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 12px; text-align: left; }
         th { background-color: #f0f0f0; }
-        .ai-score { color: #007bff; font-weight: bold; }
+        .theater-badge { background-color: #22c55e; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.9em; }
+        .btn-create { background: #007bff; color: white; padding: 10px; text-decoration: none; border-radius: 5px; }
     </style>
 </head>
 <body>
-    <h1>🎬 登録済み映画カタログ</h1>
-    <p><a href="{% url 'movies:movie_create' %}">＋ 新規映画を登録する</a></p>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>上映映画一覧 <span class="theater-badge">{{ request.user.manager_profile.theater.name }}</span></h1>
+        <p><a href="{% url 'movies:movie_create' %}" class="btn-create">＋ 新規映画を登録する</a></p>
+    </div>
 
     <table>
         <thead>
             <tr>
                 <th>タイトル</th>
                 <th>公開日</th>
-                <th>監督ランク (AI)</th>
-                <th>キャスト合計 (AI)</th>
+                <th>必須ランク</th>
+                <th>上映回数 / 期間</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -30,34 +33,52 @@
                 <td><strong>{{ movie.title }}</strong></td>
                 <td>{{ movie.release_date }}</td>
                 
-                <td class="ai-score">
-                    {% if movie.nowshowingmovie %}
-                        ★ {{ movie.nowshowingmovie.director_rank }}
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-                
-                <td class="ai-score">
-                    {% if movie.nowshowingmovie %}
-                        {{ movie.nowshowingmovie.cast_total_score }} 点
-                    {% else %}
-                        -
-                    {% endif %}
+                <td>
+                    {% with ns=movie.my_showing_data.0 %}
+                        {% if ns and ns.distributioncontract %}
+                            ランク {{ ns.distributioncontract.required_screen_rank }}
+                        {% else %}
+                            <span style="color: #999;">未設定</span>
+                        {% endif %}
+                    {% endwith %}
                 </td>
 
                 <td>
-                    <a href="{% url 'movies:movie_detail' movie.pk %}">詳細・解析結果</a>
+                    {% with ns=movie.my_showing_data.0 %}
+                        {% if ns and ns.distributioncontract %}
+                            {{ ns.distributioncontract.required_daily_runs }}回 / 
+                            {{ ns.distributioncontract.contract_period_weeks }}週
+                        {% else %}
+                            <span style="color: #999;">契約なし</span>
+                        {% endif %}
+                    {% endwith %}
+                </td>
+
+                <td>
+                    <a href="{% url 'movies:movie_detail' movie.pk %}">詳細・解析結果</a> |
+                    
+                    {% if movie.my_showing_data %}
+                        <form action="{% url 'movies:stop_showing' movie.pk %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" onclick="return confirm('{{ movie.title }} の上映を終了しますか？');" style="color: red; cursor: pointer; border: none; background: none; text-decoration: underline; padding: 0;">
+                                上映終了
+                            </button>
+                        </form>
+                    {% else %}
+                        <span style="color: #999;">終了済み</span>
+                    {% endif %}
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5">まだ映画が登録されていません。</td>
+                <td colspan="5" style="text-align: center; padding: 30px;">
+                    現在、この映画館で登録されている映画はありません。<br>
+                    「新規映画を登録する」から追加してください。
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-
     <br>
     <a href="{% url 'accounts:manager_Top' %}">支配人トップへ戻る</a>
 </body>

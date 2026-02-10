@@ -21,25 +21,6 @@ class AdminCreationForm(UserCreationForm):
         model = User # あなたが定義したカスタムユーザーモデルを指定
         fields = ("username", "email") # 必要に応じて項目を増やす
 
-# --- 最初の管理人登録View ---
-class AdminRegistrationView(CreateView):
-    model = User
-    form_class = AdminCreationForm
-    template_name = 'accounts/admin_registration.html'
-    success_url = reverse_lazy('accounts:login')
-
-    def form_valid(self, form):
-        user = form.save(commit=False)
-        user.is_top_admin = True  # 管理人フラグを立てる
-        user.save()
-        return super().form_valid(form)
-
-    # 既に管理人がいる場合は、URLを直接叩いてもログイン画面に追い返す
-    def get(self, request, *args, **kwargs):
-        if User.objects.filter(is_top_admin=True).exists():
-            return redirect('accounts:login')
-        return super().get(request, *args, **kwargs)
-
 class MyLoginView(LoginView):
     template_name = 'accounts/login.html'
 

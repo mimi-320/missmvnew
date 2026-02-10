@@ -1,0 +1,245 @@
+/* --- 支配人・ダークモード専用設定（修正版） --- */
+
+body.dark-page {
+    margin: 0;
+    padding: 20px; /* 💡 画面端に余白を作る */
+    background-color: #121212;
+    color: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center; /* 💡 短い時は真ん中、長い時は上に合わせる */
+    min-height: 100vh;   /* 💡 画面の高さに合わせる */
+    font-family: sans-serif;
+    overflow-y: auto;    /* 💡 縦スクロールを許可する（hiddenから変更） */
+}
+
+.setup-box {
+    background-color: #1e1e1e;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 450px;
+    border: 1px solid #333;
+    text-align: center;
+    margin: auto;        /* 💡 上下の余白を自動調整 */
+}
+
+/* 💡 パスワードの注意書き（箇条書き）を見やすくする */
+.form-content ul {
+    text-align: left;
+    font-size: 0.85em;
+    color: #bbb;
+    padding-left: 20px;
+    margin-bottom: 20px;
+}
+
+.form-content li {
+    margin-bottom: 5px;
+}
+
+/* 見出しとテキスト */
+.setup-box h2 {
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+.subtitle {
+    font-size: 0.9em;
+    color: #bbb;
+}
+
+.highlight {
+    font-size: 0.95em;
+    color: #3498db; /* ここだけ少し明るい青で強調 */
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.dark-hr {
+    border: 0;
+    border-top: 1px solid #333;
+    margin: 25px 0;
+}
+
+/* フォームの入力欄をダークにする */
+.form-content p {
+    text-align: left;
+}
+
+.form-content input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    background-color: #2c2c2c;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: white;
+    box-sizing: border-box; /* 算数が苦手でもサイズがズレない魔法の1行 */
+}
+
+/* 支配人用の紺色ボタン */
+.btn-navy-dark {
+    background-color: #2c3e50; /* 管理人と共通の紺色 */
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn-navy-dark:hover {
+    background-color: #34495e; /* 少し明るくして反応を見せる */
+}
+
+/* --- ダッシュボード全体の設定 --- */
+body.dashboard {
+    display: block; /* 中央寄せを解除して上から順に並べる */
+    overflow-y: auto;
+    background-color: #121212;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* --- ヘッダー --- */
+.main-header {
+    background-color: #1e1e1e;
+    color: white;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #2c3e50; /* 紺色のライン */
+}
+
+.main-header h1 {
+    font-size: 1.5em;
+    margin: 0;
+}
+
+.sub-title {
+    font-size: 0.6em;
+    color: #888;
+    margin-left: 10px;
+}
+
+.logout-link {
+    background: none;
+    border: 1px solid #555;
+    color: #bbb;
+    padding: 5px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 15px;
+}
+
+.logout-link:hover {
+    background: #c0392b;
+    color: white;
+    border-color: #c0392b;
+}
+
+/* --- 映画館バナー --- */
+.theater-info-banner {
+    background-color: #1e1e1e;
+    padding: 20px 30px;
+    border-left: 5px solid #2c3e50;
+    margin-bottom: 40px;
+    border-radius: 4px;
+}
+
+.highlight {
+    color: #3498db;
+}
+
+.error-text {
+    color: #e74c3c;
+    font-size: 1em;
+}
+
+/* --- メニューカードのグリッド --- */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); /* 💡 画面幅に合わせて自動で計算して並べる */
+    gap: 25px;
+}
+
+.menu-card {
+    background-color: #252525;
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid #333;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+.highlight-card {
+    border-color: #2c3e50;
+}
+
+.card-icon {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+}
+
+.menu-card h4 {
+    margin: 0 0 10px 0;
+    color: #fff;
+}
+
+.menu-card p {
+    font-size: 0.9em;
+    color: #aaa;
+    flex-grow: 1; /* 💡 文字数が違ってもボタンの位置を揃える */
+    margin-bottom: 20px;
+}
+
+/* --- ボタン類 --- */
+.btn-outline {
+    display: inline-block;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #555;
+    color: #ccc;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.btn-green {
+    display: inline-block;
+    text-align: center;
+    padding: 10px;
+    background-color: #27ae60;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.btn-group {
+    display: flex;
+    flex-direction: column;
+}
+
+/* フッター */
+.main-footer {
+    text-align: center;
+    padding: 40px;
+    color: #555;
+    font-size: 0.8em;
+}

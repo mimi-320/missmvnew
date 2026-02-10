@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>配給契約入力 - {{ request.user.manager_profile.theater.name }}</title>
+</head>
+<body>
+
+<div style="background-color: #e3f2fd; padding: 15px; border-left: 5px solid #2196f3; margin-bottom: 20px;">
+    ログイン中：<strong>{{ request.user.manager_profile.theater.name }}</strong> 支配人
+</div>
+
+<div class="container">
+    <h2>「{{ target_movie.title }}」の配給契約入力</h2>
+    
+    <div class="info-box">
+        <p style="margin: 0;"><strong>基本情報：</strong> {{ target_movie.runtime }}分 / {{ target_movie.release_date }} 公開</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group" style="display: none;">
+            {{ form.movie }} 
+        </div>
+
+        <div class="form-group">
+            <label>必須シアターランク</label>
+            {{ form.required_screen_rank }}
+            <small style="display:block; color:#666;">※当館のスクリーン設定に基づいたランクを選択してください。</small>
+        </div>
+
+        <div class="form-group">
+            <label>1日の最低上映回数</label>
+            {{ form.required_daily_runs }}
+        </div>
+
+        <div class="form-group">
+            <label>契約維持期間（週間）</label>
+            {{ form.contract_period_weeks }}
+            <small style="display:block; color:#007bff;">
+                ※ヒント：2週間（約14日）が目安です。
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label>上映形態（独占・シェア）</label>
+            {{ form.screening_type }}
+            <small style="color: #d32f2f; display: block; font-weight: bold;">
+                ⚠️ 注意：独占（exclusive）を選ぶと、指定スクリーンの全枠をこの映画が占有します。
+            </small>
+        </div>
+
+        <button type="submit" class="btn-submit"><strong>{{ request.user.manager_profile.theater.name }}</strong> の契約として保存</button>
+    </form>
+</div>
+
+</body>
+</html>

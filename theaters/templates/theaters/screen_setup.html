@@ -18,14 +18,13 @@
                 </thead>
                 <tbody>
                     {% for i in screen_range %}
-                    <tr>
-                        <td><strong>シアター {{ i }}</strong></td>
-                        <td>
-                            <input type="number" name="capacity_{{ i }}" required placeholder="例: 150"> 
-                            <span style="margin-left: 5px;">席</span>
-                            <input type="hidden" name="size_{{ i }}" value="Medium">
-                        </td>
-                    </tr>
+                        <tr>
+                            <td><strong>シアター {{ i }}</strong></td>
+                            <td>
+                                <input type="number" name="capacity_{{ i }}" required placeholder="例: 350"> 
+                                <span style="margin-left: 5px;">席</span>
+                                </td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>

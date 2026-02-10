@@ -1,70 +1,61 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>支配人ダッシュボード</title>
+    <title>支配人ダッシュボード - Miss Mv</title>
+    <link rel="stylesheet" href="{% static 'css/manager.css' %}">
 </head>
-<body>
-    <header style="display: flex; justify-content: space-between; align-items: center; background-color: #333; color: white; padding: 10px 20px;">
-        <h1>映画館管理システム</h1>
-        <form action="{% url 'accounts:logout' %}" method="post">
-            {% csrf_token %}
-            <button type="submit">ログアウト</button>
-        </form>
+<body class="dark-page dashboard">
+    <header class="main-header">
+        <h1>Miss Mv <span class="sub-title">| 映画館管理システム</span></h1>
+        <div class="user-info">
+            <span class="username">{{ request.user.username }} 支配人</span>
+            <form action="{% url 'accounts:logout' %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="logout-link">ログアウト</button>
+            </form>
+        </div>
     </header>
 
-    <main style="padding: 20px;">
-        <h2>ようこそ、{{ request.user.username }}さん</h2>
-        
-        <div style="background-color: #f0f0f0; padding: 20px; border-left: 5px solid #007bff; margin-bottom: 30px;">
-            <h3>担当映画館：
-                {% if theater %}
-                    <span style="color: #007bff;">{{ theater.name }}</span>
-                {% else %}
-                    <span style="color: red;">（担当映画館が未設定です。管理人に連絡してください）</span>
-                {% endif %}
-            </h3>
-        </div>
+    <main class="container">
+        <section class="theater-info-banner">
+            {% if theater %}
+                <h2>担当：<span class="highlight">{{ theater.name }}</span></h2>
+            {% else %}
+                <h2 class="error-text">担当映画館が未設定です。管理人に連絡してください</h2>
+            {% endif %}
+        </section>
 
-        <nav>
-            <ul style="list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                
-                <li style="border: 1px solid #007bff; padding: 15px; border-radius: 8px; background-color: #f0f7ff;">
-                    <h4>🎬 映画作品のカタログ登録</h4>
-                    <p>新しい映画の基本情報（タイトル、上映時間、ジャンル等）を登録します。</p>
-                    <a href="{% url 'movies:movie_create' %}" style="display: inline-block; padding: 8px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">
-                        ＋ 新しい映画を登録する
-                    </a>
-                </li>
+        <nav class="menu-grid">
+            <div class="menu-card highlight-card">
+                <div class="card-icon"></div>
+                <h4>映画作品のカタログ登録</h4>
+                <p>新しい映画の基本情報を登録します。</p>
+                <a href="{% url 'movies:movie_create' %}" class="btn-navy-dark">＋ 新規登録</a>
+            </div>
 
-                <li style="border: 1px solid #ddd; padding: 15px; border-radius: 8px;">
-                    <h4>🎞️ 上映中の映画・条件設定</h4>
-                    <p>登録済みの映画から、今上映する作品を選んで配給条件を設定します。</p>
-                    <a href="{% url 'movies:movie_list' %}">映画カタログ一覧を表示</a>
-                </li>
+            <div class="menu-card">
+                <div class="card-icon"></div>
+                <h4>上映スケジュール管理</h4>
+                <p>劇場のタイムテーブルを編成します。</p>
+                <a href="{% url 'schedulerapp:schedule_generate' %}" class="btn-outline">自動スケジュール生成</a>
+            </div>
 
-                <li style="border: 1px solid #ddd; padding: 15px; border-radius: 8px;">
-                    <h4>📅 上映スケジュール管理</h4>
-                    <p>自分の劇場のスケジュールを登録・編集します。</p>
-                    <a href="#">スケジュール一覧（未作成）</a>
-                </li>
-
-                <li style="border: 1px solid #ddd; padding: 15px; border-radius: 8px;">
-                    <h4>🎥 シアター（スクリーン）管理</h4>
-                    <p>劇場の各スクリーン情報を設定します。</p>
-                    <a href="{% url 'theaters:theater_detail' theater.pk %}">シアター詳細・設定</a>
-
-                    <a href="{% url 'theaters:my_theater_list' %}" style="display: inline-block; padding: 8px 15px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px;">
-                        自分のシアター一覧を確認
-                    </a>
-                </li>
-            </ul>
+            <div class="menu-card">
+                <div class="card-icon"></div>
+                <h4>シアター（スクリーン）管理</h4>
+                <p>スクリーンの設備や座席数の設定。</p>
+                <div class="btn-group">
+                    <a href="{% url 'theaters:theater_detail' theater.pk %}" class="btn-outline">詳細設定</a>
+                    <a href="{% url 'theaters:my_theater_list' %}" class="btn-green">シアター一覧</a>
+                </div>
+            </div>
         </nav>
     </main>
 
-    <footer style="margin-top: 50px; text-align: center;">
-        <hr>
-        <p>卒業制作：映画館予約管理システム</p>
+    <footer class="main-footer">
+        <p>卒業制作：映画館予約管理システム "Miss Mv"</p>
     </footer>
 </body>
 </html>

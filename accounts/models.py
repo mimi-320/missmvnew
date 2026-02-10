@@ -7,7 +7,6 @@ class User(AbstractUser):
     is_top_admin = models.BooleanField(default=False, verbose_name="管理人フラグ")
     is_manager = models.BooleanField(default=False, verbose_name="支配人フラグ")
 
-    # --- ここから追加：ケンカを止めるための設定 ---
     groups = models.ManyToManyField(
         Group,
         related_name="custom_user_set",  # 名前を変えて重複を避ける

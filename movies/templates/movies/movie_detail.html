@@ -1,24 +1,32 @@
+<div style="background-color: #f8f9fa; padding: 10px; border-bottom: 2px solid #ccc; margin-bottom: 20px;">
+    表示中の映画館：<strong>{{ request.user.manager_profile.theater.name }}</strong>
+</div>
+
 <h1>登録完了：{{ movie.title }}</h1>
 
 <fieldset>
-    <legend><strong>基本情報（入力したもの）</strong></legend>
+    <legend><strong>基本情報（映画マスタ共通）</strong></legend>
     <ul>
         <li>監督: {{ movie.director_name }}</li>
-        <li>キャスト: {{ movie.cast1_name }}, {{ movie.cast2_name }}</li>
+        <li>キャスト: {{ movie.cast1_name }}, {{ movie.cast2_name }}, {{ movie.cast3_name }}</li>
+        <li>上映時間: {{ movie.runtime }}分</li>
     </ul>
 </fieldset>
 
-<h2 style="color: blue;">🤖 AIが算出したデータ（自動入力結果）</h2>
+<h2 style="color: blue;">当館でのAI算出データ（自動入力結果）</h2>
 {% if ai_data %}
     <ul>
+        <li><strong>最終収益予測:</strong> ${{ ai_data.predicted_final_revenue|floatformat:0 }}</li>
+        
         <li><strong>監督ランク:</strong> {{ ai_data.director_rank }}</li>
         <li><strong>配給会社ランク:</strong> {{ ai_data.company_rank }}</li>
         <li><strong>キャスト合計スコア:</strong> {{ ai_data.cast_total_score }}</li>
         <li><strong>公開予定月:</strong> {{ ai_data.release_month }}月</li>
     </ul>
-    <p>※ここの数字が 0 以外になっていれば、AIパックとの連携は大成功です！</p>
+    <p style="color: green;">このデータは <strong>{{ request.user.manager_profile.theater.name }}</strong> の上映管理に使用されます。</p>
 {% else %}
-    <p>AIデータがまだ計算されていません。signals.pyを確認してください。</p>
+    <p style="color: red;"> この映画館（{{ request.user.manager_profile.theater.name }}）用のAIデータがまだ計算されていません。</p>
+    <p>予測を実行してから確認してください。</p>
 {% endif %}
 
 <br>

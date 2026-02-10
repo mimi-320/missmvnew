@@ -30,6 +30,7 @@ class TheaterDeleteView(LoginRequiredMixin, AdminOnlyMixin, View):
 
 # --- 管理人：各シアター（スクリーン）の登録 ---
 class ScreenSetupView(LoginRequiredMixin, AdminOnlyMixin, View):
+
     def get(self, request, pk):
         theater = get_object_or_404(Theater, pk=pk)
         screen_range = range(1, theater.total_screens + 1)
@@ -41,13 +42,14 @@ class ScreenSetupView(LoginRequiredMixin, AdminOnlyMixin, View):
     def post(self, request, pk):
         theater = get_object_or_404(Theater, pk=pk)
         for i in range(1, theater.total_screens + 1):
-            cap = request.POST.get(f'capacity_{i}')
-            size = request.POST.get(f'size_{i}')
+            cap_raw = request.POST.get(f'capacity_{i}') # 一旦受け取る
+            cap = int(cap_raw) if cap_raw else 0
+            
             Screen.objects.create(
                 theater=theater,
                 screen_number=i,
-                capacity=cap,
-                screen_size=size
+                capacity=cap
+                
             )
         return redirect('theaters:theater_list')
 
@@ -82,9 +84,18 @@ class MyTheaterListView(LoginRequiredMixin, ListView):
     context_object_name = 'screens'
 
     def get_queryset(self):
-        # 自分が「TheaterManager」か「TheaterAssignment」に登録されている映画館のIDを合体
-        ids1 = TheaterManager.objects.filter(user=self.request.user).values_list('theater', flat=True)
-        ids2 = TheaterAssignment.objects.filter(user=self.request.user).values_list('theater', flat=True)
-        all_ids = list(ids1) + list(ids2)
+        user = self.request.user
         
-        return Screen.objects.filter(theater__id__in=all_ids).order_by('screen_number')
+        # 直接 ManagerProfile テーブルから自分を探しに行く方法
+        try:
+            profile = ManagerProfile.objects.get(user=user)
+            my_theater = profile.theater
+            
+            if my_theater:
+                # ここで print(my_theater) と入れるとターミナルで確認できます
+                return Screen.objects.filter(theater=my_theater).order_by('screen_number')
+        except ManagerProfile.DoesNotExist:
+            # プロフィール自体が作られていない場合
+            print("プロフィールが見つかりません")
+            
+        return Screen.objects.none()
