@@ -24,6 +24,15 @@
             {{ form.total_screens }}
         </div>
 
+        <div class="form-group">
+            <label>営業開始時間 (最初の映画):</label>
+            {{ form.opening_time }}
+        </div>
+
+        <div class="form-group">
+            <label>最終上映開始時間 (門限):</label>
+            {{ form.last_start_time }}
+        </div>
         <div class="button-container">
             <button type="submit" class="btn-navy btn-small">映画館を追加する</button>
             <a href="{% url 'accounts:admin_Top' %}" class="btn-navy btn-small">戻る</a>

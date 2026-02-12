@@ -21,16 +21,54 @@ class MovieCreateView(CreateView):
     template_name = 'movies/movie_form.html'
 
     def form_valid(self, form):
+        # 1. まず映画本体を保存
         response = super().form_valid(form)
+        movie = self.object
         my_theater = self.request.user.manager_profile.theater
 
-        # 「ID」で判別して、自分の映画館に登録する
-        # get_or_create なら、もし2回ボタンを押しちゃっても重複エラーになりません！
-        NowShowingMovie.objects.get_or_create(
-            movie=self.object, 
+        # 2. 上映情報を作成（または取得）
+        showing, created = NowShowingMovie.objects.get_or_create(
+            movie=movie, 
             theater=my_theater
         )
-    
+
+        # 3. 【ここが重要！】作成した直後に AI の計算を強制的に実行する
+        from .apps import MoviesConfig
+        import pandas as pd
+        
+        if MoviesConfig.ai_pack:
+            pack = MoviesConfig.ai_pack
+            try:
+                # 特徴量の準備（signals.pyにある計算と同じもの）
+                d_rank = pack['rank_map'].get(movie.director_name, 0)
+                c_rank = pack['comp_map'].get(movie.company, 0)
+                total_cast = (pack['actor_map'].get(movie.cast1_name, 0) + 
+                              pack['actor_map'].get(movie.cast2_name, 0) + 
+                              pack['actor_map'].get(movie.cast3_name, 0))
+
+                input_data = {col: 0 for col in pack['features']}
+                input_data.update({
+                    'budget': float(movie.budget or 0),
+                    'release_month': movie.release_date.month if movie.release_date else 1,
+                    'is_series': 1 if movie.is_series else 0,
+                    'director_rank': d_rank,
+                    'cast_total_score': total_cast,
+                    'company_rank': c_rank,
+                    'budget*cast': float(movie.budget or 0) * total_cast,
+                })
+
+                input_df = pd.DataFrame([input_data])[pack['features']]
+                prediction = int(pack['model'].predict(input_df)[0])
+
+                # 4. 0 になる隙を与えず、ここで直接保存！
+                showing.predicted_final_revenue = prediction
+                showing.priority_rank = prediction
+                showing.is_ending_soon = False  # ✅ 確実に上映対象にする
+                showing.save()
+                
+            except Exception as e:
+                print(f"Viewでの予測エラー: {e}")
+
         return response
 
     def get_success_url(self):

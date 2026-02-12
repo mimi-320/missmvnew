@@ -3,10 +3,12 @@ from django.conf import settings
 
 # 1. 映画館テーブル
 class Theater(models.Model):
-    # 💡 ここから manager 項目を削除しました！
     name = models.CharField(max_length=100, unique=True, verbose_name="店舗名")
     address = models.CharField(max_length=200, verbose_name="住所")
     total_screens = models.IntegerField(default=0, verbose_name="所有スクリーン数")
+    
+    opening_time = models.TimeField(default="09:00", verbose_name="営業開始時間")
+    last_start_time = models.TimeField(default="21:40", verbose_name="最終上映開始時間")
 
     def __str__(self):
         return self.name

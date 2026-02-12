@@ -41,9 +41,9 @@ class NowShowingMovie(models.Model):
     # --- 【追加】ランキング計算に使うためのカラム ---
     predicted_final_revenue = models.BigIntegerField(default=0, verbose_name="予想最終興行収入")
     current_revenue = models.BigIntegerField(default=0, verbose_name="現在までの累計売上")
-    priority_rank = models.IntegerField(default=999, verbose_name="計算後優先順位")
+    priority_rank = models.IntegerField(default=0, verbose_name="計算後優先順位") # 999を止める
     current_week_num = models.IntegerField(default=1, verbose_name="現在の公開週数")
-    is_ending_soon = models.BooleanField(default=1, verbose_name="公開終了フェーズ") # ボタンで切り替え
+    is_ending_soon = models.BooleanField(default=False, verbose_name="公開終了フェーズ") # デフォルトはFalse(チェックなし)にする
 
 
     # --- 契約条件 (ここはそのまま) ---

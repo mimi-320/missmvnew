@@ -12,7 +12,7 @@ from accounts.models import ManagerProfile
 class TheaterCreateView(LoginRequiredMixin, AdminOnlyMixin, CreateView):
     model = Theater
     template_name = 'theaters/theater_create.html' 
-    fields = ['name', 'address', 'total_screens'] 
+    fields = ['name', 'address', 'total_screens', 'opening_time', 'last_start_time']
     
     def get_success_url(self):
         return reverse_lazy('theaters:screen_setup', kwargs={'pk': self.object.pk})

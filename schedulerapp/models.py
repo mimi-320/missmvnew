@@ -2,7 +2,6 @@ from django.db import models
 from movies.models import Movie
 from theaters.models import Screen
 
-# 上映枠の「設計図」
 class ScheduleTemplate(models.Model):
     name = models.CharField(max_length=50, verbose_name="テンプレート名")
 
@@ -12,15 +11,14 @@ class ScheduleTemplate(models.Model):
         help_text="この分数以下の映画にこのテンプレートが適用されます"
     )
 
-    # 例: "09:00,11:20,13:40,16:00,18:20,20:40" (カンマ区切りで保存)
-    start_times = models.CharField(
-        max_length=255, 
+    # CharField(255) から TextField に変更！
+    start_times = models.TextField(
         verbose_name="開始時間リスト", 
-        help_text="カンマ区切りで入力してください"
+        help_text="カンマ区切りで入力してください（例: 09:00,09:10...）"
     )
-    # 例: "120,120,120,120,120,120"
-    pattern_durations = models.CharField(
-        max_length=255, 
+    
+    # こちらも TextField に変更！
+    pattern_durations = models.TextField(
         verbose_name="想定映画時間リスト", 
         help_text="各枠の映画の長さをカンマ区切りで入力"
     )
@@ -36,6 +34,7 @@ class ScheduleTemplate(models.Model):
 class Schedule(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, verbose_name="映画")
     screen = models.ForeignKey(Screen, on_delete=models.CASCADE, verbose_name="スクリーン")
+    date = models.DateField(verbose_name="上映日", null=True, blank=True)
     start_time = models.DateTimeField(verbose_name="上映開始日時")
     end_time = models.DateTimeField(verbose_name="上映終了日時")
 
